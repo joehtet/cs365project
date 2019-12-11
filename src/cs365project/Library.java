@@ -1,5 +1,9 @@
 package cs365project;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
 public final class Library {
 
 	private static double deltaT;
@@ -25,6 +29,40 @@ public final class Library {
 	private void populateOptions(Node root, int n) {
 	/* Populates the binomial tree with option prices starting from the leaf nodes */
 		
+		Node node = root;
+		
+		Stack<Node> S = new Stack(); 
+        Queue<Node> Q = new LinkedList(); 
+        Q.add(node); 
+   
+        // Do something like normal level order traversal order.Following 
+        // are the differences with normal level order traversal 
+        // 1) Instead of printing a node, we push the node to stack 
+        // 2) Right subtree is visited before left subtree 
+        while (Q.isEmpty() == false)  
+        { 
+            /* Dequeue node and make it root */
+            node = Q.peek(); 
+            Q.remove(); 
+            S.push(node); 
+   
+            /* Enqueue right child */
+            if (node.down != null) 
+                // NOTE: RIGHT CHILD IS ENQUEUED BEFORE LEFT 
+                Q.add(node.down);  
+                  
+            /* Enqueue left child */
+            if (node.up != null) 
+                Q.add(node.up); 
+        } 
+   
+        // Now pop all items from stack one by one and print them 
+        while (S.empty() == false)  
+        { 
+            node = S.peek(); 
+            System.out.print(node.S + " "); 
+            S.pop(); 
+        } 
 	}
 
 	Output binom(final Derivative deriv, final MarketData mkt, int n) {
@@ -54,8 +92,6 @@ public final class Library {
 		
 		// fill tree with option price traversing back
 		populateOptions(root, n);
-
-		
 		
 		return new Output(); //placeholder 
 	};	

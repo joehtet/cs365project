@@ -10,7 +10,7 @@ public class Main {
 		double t0 = 0; // current time
 
 		MarketData mkt = new MarketData(Price, S, r, sigma, t0);
-		Derivative d = (Derivative) new VanillaOption();
+		Derivative d = (Derivative) new VanillaOption('c');
 		d.T = 2;
 		int n = 3;
 		
