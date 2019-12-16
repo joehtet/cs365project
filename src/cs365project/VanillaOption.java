@@ -10,30 +10,49 @@ public class VanillaOption extends Derivative {
 
 	@Override
 	public void terminalCondition(Node n) {
-		// TODO Auto-generated method stub
-		switch (type) {
-		case 'c':
-			break;
-
-		case 'p':
-			break;
-
-		case 'C':
-			break;
-
-		case 'P':
-			break;
-
-		default:
-
-			break;
+		if(type == 'C' || type == 'c') {
+			n.payoff = Math.max(n.S - n.K, 0);
 		}
-		
+		else {
+			n.payoff = Math.max(n.K - n.S, 0);
+		}
+
+		n.fugit = T;
 	}
 
 	@Override
 	public void valuationTest(Node n) {
-		// TODO Auto-generated method stub
+		double earlyPayoff;
+		double expPayoff;
+
+		switch (type) {
+		case 'c':
+			n.payoff = Math.max(n.S - n.K, 0);
+
+			break;
+
+		case 'p':
+			n.payoff = Math.max(n.K - n.S, 0);
+			break;
+
+		case 'C':
+			earlyPayoff = n.S - n.K;
+			expPayoff = Math.exp(-1*mkt.r*deltaT)*((u*p)+(d*q));
+
+			n.payoff = Math.max(earlyPayoff, expPayoff);
+			break;
+
+		case 'P':
+			earlyPayoff = n.K - n.S;
+
+//			expPayoff = Math.exp(-1*mkt.r*deltaT)*((n.S*p)+(n.S*q));
+//			System.out.println(n.S);
+//			n.payoff = Math.max(earlyPayoff, expPayoff);
+			break;
+
+		default:
+			break;
+		}
 		
 	}
 }
