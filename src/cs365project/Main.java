@@ -14,7 +14,7 @@ public class Main {
 
 		MarketData mkt = new MarketData(Price, S, r, sigma, t0, K);
 
-		Derivative d = (Derivative) new VanillaOption('P');
+		Derivative d = (Derivative) new VanillaOption('c');
 		d.T = .3; // timestep
 		
 		Library lib = new Library();

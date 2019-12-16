@@ -78,6 +78,8 @@ public final class Library {
 	 * of a derivative.
 	 */
 		this.deriv = deriv;
+		this.deriv.mkt = mkt;
+		this.n = n;
 
 		deltaT = (deriv.T - mkt.t0) / n;
 		u = Math.exp( mkt.sigma * Math.sqrt(deltaT) );
@@ -85,18 +87,17 @@ public final class Library {
 		double a = Math.exp( mkt.r * deltaT);
 		p = (a-d) / (u-d);
 		q = 1-p;
-	
 
-		// fill tree with stock price traversing forward
 		Node root = new Node();
 		root.S = mkt.S;
-		
+
+		// fill tree with stock price traversing forward
 		populateStocks(root, n);
-		
-		printTree(root);
-		
+
 		// fill tree with option price traversing back
 		populateOptions(root, n);
+
+		printTree(root);
 		
 		return new Output(); // placeholder 
 	};	

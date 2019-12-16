@@ -10,11 +10,12 @@ public class VanillaOption extends Derivative {
 
 	@Override
 	public void terminalCondition(Node n) {
+		System.out.println("K" + mkt.K);
 		if(type == 'C' || type == 'c') {
-			n.payoff = Math.max(n.S - n.K, 0);
+			n.payoff = Math.max(n.S - mkt.K, 0);
 		}
 		else {
-			n.payoff = Math.max(n.K - n.S, 0);
+			n.payoff = Math.max(mkt.K - n.S, 0);
 		}
 
 		n.fugit = T;
@@ -23,7 +24,7 @@ public class VanillaOption extends Derivative {
 	@Override
 	public void valuationTest(Node n) {
 		double earlyPayoff;
-		double expPayoff;
+		double expPayoff = 0;
 
 		switch (type) {
 		case 'c':
@@ -37,7 +38,7 @@ public class VanillaOption extends Derivative {
 
 		case 'C':
 			earlyPayoff = n.S - n.K;
-			expPayoff = Math.exp(-1*mkt.r*deltaT)*((u*p)+(d*q));
+//			expPayoff = Math.exp(-1*mkt.r*deltaT)*((n.S*p)+(n.S*q));
 
 			n.payoff = Math.max(earlyPayoff, expPayoff);
 			break;
