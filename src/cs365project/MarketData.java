@@ -6,16 +6,14 @@ final class MarketData {
 	public double r; // interest rate
 	public double sigma; // volatility
 	public double t0; // current time
-	public double K; // strike price
 	
 	
-	public MarketData(double Price, double S, double r, double sigma, double t0, double K) {
+	public MarketData(double Price, double S, double r, double sigma, double t0) {
 		this.Price = Price;
 		this.S = S;
 		this.r = r;
 		this.sigma = sigma;
 		this.t0 = t0;
-		this.K = K;
 	}
 	
 }

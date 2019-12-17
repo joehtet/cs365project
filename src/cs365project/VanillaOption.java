@@ -2,20 +2,22 @@ package cs365project;
 
 public class VanillaOption extends Derivative {
 	
-	char type; // can be c, C, p, or P
+	char type; // Type of option, can be c, C, p, or P 
+	double K;  // Strike price
 	
-	public VanillaOption(char t, double T) {
+	public VanillaOption(char t, double k, double T) {
 		type = t;
+		K = k;
 		super.T = T;
 	}
 
 	@Override
 	public void terminalCondition(Node n) {
 		if(type == 'C' || type == 'c') {
-			n.payoff = Math.max(n.S - mkt.K, 0);
+			n.payoff = Math.max(n.S - K, 0);
 		}
 		else {
-			n.payoff = Math.max(mkt.K - n.S, 0);
+			n.payoff = Math.max(K - n.S, 0);
 		}
 
 		n.fugit = T;
@@ -40,7 +42,7 @@ public class VanillaOption extends Derivative {
 			break;
 
 		case 'C':
-			earlyPayoff = n.S - mkt.K;
+			earlyPayoff = n.S - K;
 			expPayoff = Math.exp(-1*mkt.r*deltaT)*((n.up.payoff*p)+(n.down.payoff*q));
 			
 			// early exercise
@@ -55,13 +57,13 @@ public class VanillaOption extends Derivative {
 			break;
 
 		case 'P':
-			earlyPayoff = mkt.K - n.S;
+			earlyPayoff = K - n.S;
 			expPayoff = Math.exp(-1*mkt.r*deltaT)*((n.up.payoff*p)+(n.down.payoff*q));
 
 			// early exercise
 			if(earlyPayoff > expPayoff) {
 				n.payoff = earlyPayoff;
-				n.fugit = deltaT * n.treeLevel;
+				n.fugit = deltaT * n.timeStep;
 			}
 			else {
 				n.payoff = expPayoff;

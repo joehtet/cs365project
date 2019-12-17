@@ -5,9 +5,11 @@ public class BermudanOption extends Derivative {
 	public double window_end;
 
 	char type; // can be c, C, p, or P
+	double K;  // Strike price
 	
-	public BermudanOption(char t, double T, double begin, double end) {
+	public BermudanOption(char t, double k, double T, double begin, double end) {
 		type = t;
+		K = k;
 		super.T = T;
 		window_begin = begin;
 		window_end = end;
@@ -16,10 +18,10 @@ public class BermudanOption extends Derivative {
 	@Override
 	public void terminalCondition(Node n) {
 		if(type == 'C' || type == 'c') {
-			n.payoff = Math.max(n.S - mkt.K, 0);
+			n.payoff = Math.max(n.S - K, 0);
 		}
 		else {
-			n.payoff = Math.max(mkt.K - n.S, 0);
+			n.payoff = Math.max(K - n.S, 0);
 		}
 
 		n.fugit = T;
@@ -27,7 +29,7 @@ public class BermudanOption extends Derivative {
 
 	@Override
 	public void valuationTest(Node n) {
-		double t = n.treeLevel * deltaT;
+		double t = n.timeStep * deltaT;
 		double earlyPayoff;
 		double expPayoff = 0;
 		
@@ -45,7 +47,7 @@ public class BermudanOption extends Derivative {
 			break;
 
 		case 'C':
-			earlyPayoff = n.S - mkt.K;
+			earlyPayoff = n.S - K;
 			expPayoff = Math.exp(-1*mkt.r*deltaT)*((n.up.payoff*p)+(n.down.payoff*q));
 			
 			// early exercise
@@ -60,13 +62,13 @@ public class BermudanOption extends Derivative {
 			break;
 
 		case 'P':
-			earlyPayoff = mkt.K - n.S;
+			earlyPayoff = K - n.S;
 			expPayoff = Math.exp(-1*mkt.r*deltaT)*((n.up.payoff*p)+(n.down.payoff*q));
 
 			// early exercise
 			if(earlyPayoff > expPayoff & t >= window_begin && t <= window_end ) {
 				n.payoff = earlyPayoff;
-				n.fugit = deltaT * n.treeLevel;
+				n.fugit = deltaT * n.timeStep;
 			}
 			else {
 				n.payoff = expPayoff;

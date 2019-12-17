@@ -13,13 +13,12 @@ public final class Library {
 	private static double q;
 	private static int n;
 	private static Derivative D;
-	
 
 	private void populateStocks(Node root, int i) {
 	/* Recursively populate the binomial tree and fill it with stock prices */
 
 		Node node = root;
-		node.treeLevel = n - i;
+		node.timeStep = n - i;
 
 		if(i==0) {
 			return;
@@ -61,7 +60,7 @@ public final class Library {
             node = stack.peek(); 
             
 			/* Node is a leaf node */
-			if(node.treeLevel == n) {
+			if(node.timeStep == n) {
 				D.terminalCondition(node);
 			}
 			else {
@@ -75,8 +74,9 @@ public final class Library {
 	private boolean isValid(Derivative de, MarketData mt, int N) {
 	/* Validate the inputs of the market data */
 
-		if(N < 1 || mt.K < 0 || mt.Price <=0 || mt.r > 1 || mt.r < 0 || 
-			mt.S < 0 || mt.sigma > 1 || mt.sigma < 0 || mt.t0 < 0 || de.T < mt.t0) {
+		if(N < 1 || de.K < 0 	 || mt.Price <=0 || mt.S < 0
+			     || mt.r > 1 	 || mt.r < 0 	 || mt.sigma < 0 
+				 || mt.t0 < 0 	 || de.T < mt.t0) {
 			return false;
 		}
 		
@@ -89,6 +89,7 @@ public final class Library {
 	 * of a derivative.
 	 */
 		
+		/* Handle invalid inputs */
 		if(!isValid(deriv, mkt, n)) {
 			Output o = new Output();
 			o.fugit = 0;
@@ -96,6 +97,8 @@ public final class Library {
 			return o;
 		};
 		
+		
+		/* Calculate constants */
 		deltaT = (deriv.T - mkt.t0) / n;
 		u = Math.exp( mkt.sigma * Math.sqrt(deltaT) );
 		d = 1/u;
@@ -121,10 +124,10 @@ public final class Library {
 		Node root = new Node();
 		root.S = mkt.S;
 
-		// fill tree with stock price traversing forward
+		// Fill tree with stock price traversing forward
 		populateStocks(root, n);
 
-		// fill tree with option price traversing back
+		// Fill tree with option price traversing back
 		populateOptions(root, n);
 
 		printTree(root);
@@ -156,10 +159,10 @@ public final class Library {
 		Output tempO = out;
 
 		out.num_iter = 0;
-		while(Math.abs(out.FV -mkt.Price) > tol) {
+		while(Math.abs(out.FV - mkt.Price) > tol) {
 			sigmaMid = (sigmaLow + sigmaHigh) /2;
 			
-			mMid = new MarketData(mkt.Price, mkt.S, mkt.r, sigmaMid, mkt.t0, mkt.K);
+			mMid = new MarketData(mkt.Price, mkt.S, mkt.r, sigmaMid, mkt.t0);
 
 			tempO = binom(deriv, mMid, n);
 			tempO.impvol = sigmaMid;
@@ -173,11 +176,12 @@ public final class Library {
 			
 			out.FV = tempO.FV;
 			
+			/* Impvol failed, return failure */
 			if(out.num_iter >= max_iter) {
 				out.impvol = 0;
 				out.num_iter = 0;
 				success = 1;
-				break;
+				return success;
 			}
 
 			out.num_iter++;
@@ -186,49 +190,44 @@ public final class Library {
 		out.impvol = tempO.impvol;
 		
 		return success;
-
 	};
 	
 
-	/* Print tree function used for debugging purposes
+	/* 
+	 * Print the binomial tree for debugging purposes 
 	 * 
-	 * Source: https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
-	 */
-	static void print2DUtil(Node root, int space)  
+	 * Based on https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
+	 * */
+
+	private static void printTree(Node root)  
 	{  
-		// Base case  
-		if (root == null)  
+		printHelper(root, 0);  
+	}  
+
+	private static void printHelper(Node n, int space)  
+	{  
+		// Terminal condition
+		if (n == null)  
 			return;  
 	  
 		// Increase distance between levels  
-		space += 10;  
+		space += 20;  
 	  
-		// Process right child first  
-		print2DUtil(root.up, space);  
+		// handle node up
+		printHelper(n.up, space);  
 	  
-		// Print current node after space  
-		// count  
-		System.out.print("\n");  
 		for (int i = 10; i < space; i++)  
 			System.out.print(" ");  
-		System.out.print(root.S + "\n");  
+		System.out.print(n.S + "\n");  
 		for (int i = 10; i < space; i++)  
 			System.out.print(" ");  
-		System.out.print(root.payoff + "\n");  
+		System.out.print(n.payoff + "\n");  
 		for (int i = 10; i < space; i++)  
 			System.out.print(" ");  
-		System.out.print(root.fugit + "\n");  
+		System.out.print(n.fugit + "\n");  
 
 
-		// Process left child  
-		print2DUtil(root.down, space);  
-	}  
-	  
-	// Wrapper over print2DUtil()  
-	public static void printTree(Node root)  
-	{  
-		// Pass initial space count as 0  
-		print2DUtil(root, 0);  
+		printHelper(n.down, space);  
 	}  
 		 
 }

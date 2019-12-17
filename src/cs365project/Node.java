@@ -11,8 +11,8 @@ final class Node {
 	public double earlyPayoff = 0;
 	
 
-	/* Level in the tree the node belongs to */
-	public int treeLevel = -1;
+	/* Current time for this node */
+	public int timeStep = -1;
 	
 	/* Pointers to top and bottom child of node */
 	public Node up = null;

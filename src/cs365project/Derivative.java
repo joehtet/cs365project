@@ -2,6 +2,9 @@ package cs365project;
 
 abstract class Derivative {
 	public double T;  /* expiration time */
+	
+	double K; /* strike price */
+
 	public MarketData mkt;
 	public double deltaT;
 	public double u;
