@@ -2,8 +2,12 @@ package cs365project;
 
 abstract class Derivative {
 	public double T;  /* expiration time */
-	protected MarketData mkt;
-
+	public MarketData mkt;
+	public double deltaT;
+	public double u;
+	public double d;
+	public double p;
+	public double q;
 
 
 	public abstract void terminalCondition(Node n); 
